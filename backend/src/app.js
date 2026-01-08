@@ -1,13 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 
+const authRoutes = require("./routes/authRoutes");
+const bookRoutes = require("./routes/bookRoutes");
+
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Test Route
+app.use("/api/auth", authRoutes);
+app.use("/api/books", bookRoutes);
+
 app.get("/", (req, res) => {
   res.send("BookNest API is running...");
 });
