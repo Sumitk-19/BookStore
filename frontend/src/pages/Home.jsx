@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useCart } from "../context/CartContext";
+
 
 function Home() {
   const [books, setBooks] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { addToCart } = useCart();
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (pageNumber = 1) => {
     try {
       setLoading(true);
       setError("");
@@ -17,10 +22,14 @@ function Home() {
         params: {
           keyword: keyword || undefined,
           category: category || undefined,
+          page: pageNumber,
+          limit: 6,
         },
       });
 
       setBooks(data.books);
+      setPage(data.page);
+      setPages(data.pages);
     } catch (err) {
       setError("Failed to load books");
     } finally {
@@ -29,12 +38,12 @@ function Home() {
   };
 
   useEffect(() => {
-    fetchBooks();
+    fetchBooks(1);
   }, []);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    fetchBooks();
+    fetchBooks(1);
   };
 
   return (
@@ -71,11 +80,31 @@ function Home() {
         {books.map((book) => (
           <div key={book._id} style={styles.card}>
             <h3>{book.title}</h3>
-            <p>Author: {book.author}</p>
+            <p>{book.author}</p>
             <p>₹{book.price}</p>
             <p>{book.category}</p>
-            <p>Stock: {book.stock}</p>
+
+             <button onClick={() => addToCart(book)}>
+               Add to Cart
+             </button>
           </div>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div style={styles.pagination}>
+        {[...Array(pages).keys()].map((x) => (
+          <button
+            key={x + 1}
+            onClick={() => fetchBooks(x + 1)}
+            style={{
+              ...styles.pageBtn,
+              background: x + 1 === page ? "#333" : "#fff",
+              color: x + 1 === page ? "#fff" : "#000",
+            }}
+          >
+            {x + 1}
+          </button>
         ))}
       </div>
     </div>
@@ -97,6 +126,17 @@ const styles = {
     border: "1px solid #ddd",
     padding: "12px",
     borderRadius: "6px",
+  },
+  pagination: {
+    marginTop: "20px",
+    display: "flex",
+    gap: "8px",
+    justifyContent: "center",
+  },
+  pageBtn: {
+    padding: "6px 12px",
+    cursor: "pointer",
+    border: "1px solid #ccc",
   },
 };
 

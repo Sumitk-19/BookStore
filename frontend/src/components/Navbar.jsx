@@ -32,10 +32,18 @@ function Navbar() {
               Hi, {user.name}
             </span>
 
+            <Link to="/orders">My Orders</Link>
+            <Link to="/cart">Cart</Link>
+
+
             {isAdmin && (
+              <>
               <Link to="/admin" style={styles.link}>
                 Admin
               </Link>
+              <Link to="/admin/orders">Orders</Link>
+              </>
+
             )}
 
             <button onClick={logoutHandler} style={styles.button}>
