@@ -1,8 +1,10 @@
 const Book = require("../models/Book");
+const asyncHandler = require("../middleware/asyncHandler");
 
-// GET all books (Public)
-// GET all books with search, filter, pagination
-exports.getAllBooks = async (req, res) => {
+// @desc    Get all books (search, filter, pagination)
+// @route   GET /api/books
+// @access  Public
+exports.getAllBooks = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 6;
   const skip = (page - 1) * limit;
@@ -34,47 +36,58 @@ exports.getAllBooks = async (req, res) => {
     totalBooks,
     books,
   });
-};
+});
 
-// GET single book (Public)
-exports.getBookById = async (req, res) => {
+// @desc    Get single book
+// @route   GET /api/books/:id
+// @access  Public
+exports.getBookById = asyncHandler(async (req, res) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return res.status(404).json({ message: "Book not found" });
+    res.status(404);
+    throw new Error("Book not found");
   }
 
   res.json(book);
-};
+});
 
-// CREATE book (Admin)
-exports.createBook = async (req, res) => {
-  const book = new Book(req.body);
-  const createdBook = await book.save();
-  res.status(201).json(createdBook);
-};
+// @desc    Create book
+// @route   POST /api/books
+// @access  Admin
+exports.createBook = asyncHandler(async (req, res) => {
+  const book = await Book.create(req.body);
+  res.status(201).json(book);
+});
 
-// UPDATE book (Admin)
-exports.updateBook = async (req, res) => {
+// @desc    Update book
+// @route   PUT /api/books/:id
+// @access  Admin
+exports.updateBook = asyncHandler(async (req, res) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return res.status(404).json({ message: "Book not found" });
+    res.status(404);
+    throw new Error("Book not found");
   }
 
   Object.assign(book, req.body);
   const updatedBook = await book.save();
-  res.json(updatedBook);
-};
 
-// DELETE book (Admin)
-exports.deleteBook = async (req, res) => {
+  res.json(updatedBook);
+});
+
+// @desc    Delete book
+// @route   DELETE /api/books/:id
+// @access  Admin
+exports.deleteBook = asyncHandler(async (req, res) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return res.status(404).json({ message: "Book not found" });
+    res.status(404);
+    throw new Error("Book not found");
   }
 
   await book.deleteOne();
-  res.json({ message: "Book removed" });
-};
+  res.json({ message: "Book removed successfully" });
+});

@@ -1,18 +1,23 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
+const asyncHandler = require("../middleware/asyncHandler");
 
-// REGISTER
-exports.registerUser = async (req, res) => {
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+exports.registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
+    res.status(400);
+    throw new Error("All fields are required");
   }
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    return res.status(400).json({ message: "User already exists" });
+    res.status(400);
+    throw new Error("User already exists");
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -28,28 +33,34 @@ exports.registerUser = async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    isAdmin: user.isAdmin,
     token: generateToken(user._id),
   });
-};
+});
 
-// LOGIN
-exports.loginUser = async (req, res) => {
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+exports.loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    res.status(401);
+    throw new Error("Invalid email or password");
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    res.status(401);
+    throw new Error("Invalid email or password");
   }
 
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
+    isAdmin: user.isAdmin,
     token: generateToken(user._id),
   });
-};
+});
