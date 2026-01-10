@@ -17,10 +17,7 @@ function Checkout() {
 
   const placeOrder = async () => {
     try {
-      await api.post(
-        "/orders",
-        {
-          orderItems: cartItems.map((item) => ({
+  const { data } = await api.post("/orders",{orderItems: cartItems.map((item) => ({
             book: item._id,
             title: item.title,
             price: item.price,
@@ -36,9 +33,9 @@ function Checkout() {
       );
 
       clearCart();
-      navigate("/orders");
+      navigate(`/order-success/${data._id}`);
     } catch (err) {
-      alert(err.response?.data?.message || "Order failed");
+      alert("Order failed");
     }
   };
 

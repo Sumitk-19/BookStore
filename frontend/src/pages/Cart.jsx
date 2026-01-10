@@ -22,7 +22,14 @@ function Cart() {
     <div>
       <button onClick={() => decreaseQty(item._id)}>-</button>
       <span style={{ margin: "0 10px" }}>{item.quantity}</span>
-      <button onClick={() => increaseQty(item._id)}>+</button>
+      <button onClick={() => increaseQty(item._id)}
+       disabled={item.quantity >= item.stock}>+</button>
+
+      {item.quantity >= item.stock && (
+       <p style={{ color: "red", fontSize: "12px" }}>
+        Only {item.stock} in stock
+       </p>
+  )}
     </div>
 
     <p>₹{item.price * item.quantity}</p>

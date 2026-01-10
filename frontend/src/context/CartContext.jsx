@@ -33,14 +33,19 @@ export const CartProvider = ({ children }) => {
   };
 
   const increaseQty = (id) => {
-  setCartItems(
-    cartItems.map((item) =>
-      item._id === id
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
-    )
+  setCartItems((prevItems) =>
+    prevItems.map((item) => {
+      if (item._id === id) {
+        if (item.quantity >= item.stock) {
+          return item; // Do not increase beyond stock
+        }
+        return { ...item, quantity: item.quantity + 1 };
+      }
+      return item;
+    })
   );
 };
+
 
 const decreaseQty = (id) => {
   setCartItems(

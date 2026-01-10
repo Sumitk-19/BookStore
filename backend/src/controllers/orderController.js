@@ -1,9 +1,9 @@
 const Order = require("../models/Order");
 const Book = require("../models/Book");
 const asyncHandler = require("../middleware/asyncHandler");
+const sendEmail = require("../utils/sendEmail"); // 👈 use require, not import
 
-
-// @desc    Create order + deduct stock
+// @desc    Create order + deduct stock + send email
 // @route   POST /api/orders
 // @access  User
 exports.createOrder = asyncHandler(async (req, res) => {
@@ -14,7 +14,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new Error("No order items provided");
   }
 
-  // 1️⃣ Validate stock for each book
+  // 1️⃣ Validate stock
   for (const item of orderItems) {
     const book = await Book.findById(item.book);
 
@@ -38,15 +38,30 @@ exports.createOrder = asyncHandler(async (req, res) => {
     await book.save();
   }
 
-  // 3️⃣ Create order AFTER stock deduction
+  // 3️⃣ Create order
   const order = await Order.create({
     user: req.user._id,
     orderItems,
     totalAmount,
   });
 
+  // 4️⃣ Send confirmation email 📧
+  await sendEmail(
+    req.user.email,
+    "Your BookNest Order is Confirmed",
+    `
+      <h2>Order Confirmed 🎉</h2>
+      <p>Order ID: ${order._id}</p>
+      <p>Total Amount: ₹${order.totalAmount}</p>
+      <p>We will notify you when your books are shipped.</p>
+      <br/>
+      <p>Thank you for shopping with <b>BookNest</b>.</p>
+    `
+  );
+
   res.status(201).json(order);
 });
+
 // @desc    Get logged-in user's orders
 // @route   GET /api/orders/my-orders
 // @access  User
