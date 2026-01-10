@@ -7,7 +7,7 @@ const sendEmail = require("../utils/sendEmail"); // 👈 use require, not import
 // @route   POST /api/orders
 // @access  User
 exports.createOrder = asyncHandler(async (req, res) => {
-  const { orderItems, totalAmount } = req.body;
+  const { orderItems, totalAmount, shippingAddress } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
@@ -43,6 +43,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
     user: req.user._id,
     orderItems,
     totalAmount,
+    shippingAddress,
   });
 
   // 4️⃣ Send confirmation email 📧

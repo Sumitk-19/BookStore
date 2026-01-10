@@ -1,15 +1,14 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import api from "../api/axios";
 
-// 1️⃣ Create context
 const AuthContext = createContext();
 
-// 2️⃣ Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 3️⃣ Load auth data from localStorage on app start
+  // Load from localStorage on refresh
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -22,20 +21,32 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // 4️⃣ Login function
-  const login = (userData, jwtToken) => {
-    setUser(userData);
-    setToken(jwtToken);
+  // Login (API based)
+  const login = async (email, password) => {
+    const { data } = await api.post("/auth/login", { email, password });
 
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", jwtToken);
+    setUser(data);
+    setToken(data.token);
+
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", data.token);
   };
 
-  // 5️⃣ Logout function
+  // Register
+  const register = async (name, email, password) => {
+    const { data } = await api.post("/auth/register", { name, email, password });
+
+    setUser(data);
+    setToken(data.token);
+
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", data.token);
+  };
+
+  // Logout
   const logout = () => {
     setUser(null);
     setToken(null);
-
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
@@ -46,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         user,
         token,
         login,
+        register,
         logout,
         loading,
         isAuthenticated: !!token,
@@ -57,5 +69,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 6️⃣ Custom hook (VERY IMPORTANT)
 export const useAuth = () => useContext(AuthContext);

@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
-
 
 function Home() {
   const [books, setBooks] = useState([]);
@@ -23,7 +22,7 @@ function Home() {
           keyword: keyword || undefined,
           category: category || undefined,
           page: pageNumber,
-          limit: 6,
+          limit: 8,
         },
       });
 
@@ -47,22 +46,29 @@ function Home() {
   };
 
   return (
-    <div>
-      <h1>BookNest</h1>
-      <p>Browse our collection</p>
+    <div className="max-w-7xl mx-auto px-6 py-6">
 
-      {/* Search + Filter */}
-      <form onSubmit={submitHandler} style={styles.filter}>
+      {/* Header
+      <h1 className="text-3xl font-bold mb-1">BookNest</h1>
+      <p className="text-gray-600 mb-6">Browse our collection</p> */}
+
+      {/* Search & Filter */}
+      <form
+        onSubmit={submitHandler}
+        className="bg-white shadow rounded-lg p-4 flex flex-col md:flex-row gap-3 mb-6"
+      >
         <input
           type="text"
           placeholder="Search by title or author"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
+          className="flex-1 border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
         />
 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          className="border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="">All Categories</option>
           <option value="Self Help">Self Help</option>
@@ -70,38 +76,55 @@ function Home() {
           <option value="Technology">Technology</option>
         </select>
 
-        <button type="submit">Search</button>
+        <button
+          type="submit"
+          className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 transition"
+        >
+          Search
+        </button>
       </form>
 
-      {loading && <p>Loading books...</p>}
-      {error && <p>{error}</p>}
+      {/* Loading / Error */}
+      {loading && <p className="text-center">Loading books...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
-      <div style={styles.grid}>
+      {/* Books Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {books.map((book) => (
-          <div key={book._id} style={styles.card}>
-            <h3>{book.title}</h3>
-            <p>{book.author}</p>
-            <p>₹{book.price}</p>
-            <p>{book.category}</p>
+          <div
+            key={book._id}
+            className="bg-white rounded-xl shadow p-4 hover:shadow-lg transition flex flex-col"
+          >
+            <div className="flex-1">
+              <h3 className="text-lg font-bold">{book.title}</h3>
+              <p className="text-sm text-gray-600">{book.author}</p>
+              <p className="text-green-600 font-semibold mt-1">₹{book.price}</p>
+              <span className="inline-block text-xs bg-gray-100 px-2 py-1 rounded mt-1">
+                {book.category}
+              </span>
+            </div>
 
-             <button onClick={() => addToCart(book)}>
-               Add to Cart
-             </button>
+            <button
+              onClick={() => addToCart(book)}
+              className="mt-4 bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
+            >
+              Add to Cart
+            </button>
           </div>
         ))}
       </div>
 
       {/* Pagination */}
-      <div style={styles.pagination}>
+      <div className="flex justify-center mt-8 gap-2">
         {[...Array(pages).keys()].map((x) => (
           <button
             key={x + 1}
             onClick={() => fetchBooks(x + 1)}
-            style={{
-              ...styles.pageBtn,
-              background: x + 1 === page ? "#333" : "#fff",
-              color: x + 1 === page ? "#fff" : "#000",
-            }}
+            className={`px-3 py-1 rounded border ${
+              x + 1 === page
+                ? "bg-orange-500 text-white"
+                : "bg-white hover:bg-gray-100"
+            }`}
           >
             {x + 1}
           </button>
@@ -110,34 +133,5 @@ function Home() {
     </div>
   );
 }
-
-const styles = {
-  filter: {
-    display: "flex",
-    gap: "10px",
-    margin: "20px 0",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-    gap: "16px",
-  },
-  card: {
-    border: "1px solid #ddd",
-    padding: "12px",
-    borderRadius: "6px",
-  },
-  pagination: {
-    marginTop: "20px",
-    display: "flex",
-    gap: "8px",
-    justifyContent: "center",
-  },
-  pageBtn: {
-    padding: "6px 12px",
-    cursor: "pointer",
-    border: "1px solid #ccc",
-  },
-};
 
 export default Home;

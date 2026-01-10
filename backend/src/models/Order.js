@@ -23,6 +23,14 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    shippingAddress: {
+      name: String,
+      phone: String,
+      address: String,
+      city: String,
+      pincode: String,
+    },
+
     status: {
       type: String,
       enum: ["Pending", "Paid", "Shipped", "Delivered"],

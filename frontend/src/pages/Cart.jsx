@@ -1,50 +1,95 @@
+import React from "react";
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Cart() {
-  const { cartItems, removeFromCart, increaseQty, decreaseQty, totalAmount } = useCart();
+  const { cartItems, removeFromCart, increaseQty, decreaseQty } = useCart();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const checkout = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      navigate("/checkout");
+    }
+  };
 
   if (cartItems.length === 0) {
-    return <p>Your cart is empty</p>;
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center">
+        <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+        <Link to="/" className="text-orange-500 font-semibold hover:underline">
+          Browse Books
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h2>Your Cart</h2>
+    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      {/* Left: Cart Items */}
+      <div className="md:col-span-2 space-y-4">
+        <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
 
-     {cartItems.map((item) => (
-     <div key={item._id}>
-    <p>{item.title}</p>
+        {cartItems.map((item) => (
+          <div
+            key={item._id}
+            className="bg-white p-4 rounded-lg shadow flex justify-between items-center"
+          >
+            <div>
+              <h3 className="font-semibold">{item.title}</h3>
+              <p className="text-sm text-gray-500">₹{item.price}</p>
+            </div>
 
-    <div>
-      <button onClick={() => decreaseQty(item._id)}>-</button>
-      <span style={{ margin: "0 10px" }}>{item.quantity}</span>
-      <button onClick={() => increaseQty(item._id)}
-       disabled={item.quantity >= item.stock}>+</button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => decreaseQty(item._id)}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                −
+              </button>
 
-      {item.quantity >= item.stock && (
-       <p style={{ color: "red", fontSize: "12px" }}>
-        Only {item.stock} in stock
-       </p>
-  )}
-    </div>
+              <span className="font-medium">{item.quantity}</span>
 
-    <p>₹{item.price * item.quantity}</p>
-    <button onClick={() => removeFromCart(item._id)}>Remove</button>
-     </div>
-))}
+              <button
+                onClick={() => increaseQty(item._id)}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                +
+              </button>
+            </div>
 
+            <button
+              onClick={() => removeFromCart(item._id)}
+              className="text-red-500 hover:underline"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
 
-      <h3>Total: ₹{totalAmount}</h3>
+      {/* Right: Order Summary */}
+      <div className="bg-white p-6 rounded-lg shadow h-fit">
+        <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+        <p className="mb-2">Total Items: {cartItems.length}</p>
+        <p className="font-bold text-lg mb-4">Total: ₹{total}</p>
 
-      {isAuthenticated ? (
-      <Link to="/checkout">Proceed to Checkout</Link>
-   ) : (
-      <Link to="/login">Login to Checkout</Link>
-)}
+        <button
+  onClick={() => navigate("/checkout")}
+  className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600"
+>
+  Proceed to Checkout
+</button>
+      </div>
     </div>
   );
 }
