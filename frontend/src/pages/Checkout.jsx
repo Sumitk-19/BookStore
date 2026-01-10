@@ -2,11 +2,18 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function Checkout() {
   const { cartItems, totalAmount, clearCart } = useCart();
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
 
   const placeOrder = async () => {
     try {
@@ -34,6 +41,7 @@ function Checkout() {
       alert(err.response?.data?.message || "Order failed");
     }
   };
+
 
   return (
     <div>
