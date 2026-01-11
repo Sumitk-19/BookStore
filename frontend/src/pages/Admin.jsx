@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
 import api from "../api/axios";
+import BookModal from "../components/BookModal";
 
 function Admin() {
   const [books, setBooks] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     fetchBooks();
@@ -21,37 +23,44 @@ function Admin() {
     fetchBooks();
   };
 
-  const handleEdit = async (book) => {
-    const title = prompt("Title", book.title);
-    const price = prompt("Price", book.price);
-    const stock = prompt("Stock", book.stock);
-
-    if (!title || !price || !stock) return;
-
-    await api.put(`/books/${book._id}`, {
-      title,
-      price,
-      stock,
-    });
-
+  const saveBookHandler = async (formData) => {
+    if (selectedBook) {
+      await api.put(`/books/${selectedBook._id}`, formData);
+    } else {
+      await api.post("/books", formData);
+    }
+    setShowModal(false);
     fetchBooks();
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <Link
-       to="/admin/orders"
-       className="inline-block mb-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
-    >
+        to="/admin/orders"
+        className="inline-block mb-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+      >
         Manage All Orders
       </Link>
 
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+
+        <button
+          onClick={() => {
+            setSelectedBook(null);
+            setShowModal(true);
+          }}
+          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+        >
+          + Add New Book
+        </button>
+      </div>
 
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-100">
             <tr>
+              <th className="p-3">Image</th>
               <th className="p-3">Title</th>
               <th className="p-3">Author</th>
               <th className="p-3">Price</th>
@@ -63,6 +72,13 @@ function Admin() {
           <tbody>
             {books.map((book) => (
               <tr key={book._id} className="border-t">
+                <td className="p-3">
+                  <img
+                    src={book.image}
+                    alt={book.title}
+                    className="h-12 w-10 object-cover rounded shadow"
+                  />
+                </td>
                 <td className="p-3 font-medium">{book.title}</td>
                 <td className="p-3">{book.author}</td>
                 <td className="p-3 text-green-600">₹{book.price}</td>
@@ -70,7 +86,10 @@ function Admin() {
                 <td className="p-3">{book.stock}</td>
                 <td className="p-3 flex justify-center gap-2">
                   <button
-                    onClick={() => handleEdit(book)}
+                    onClick={() => {
+                      setSelectedBook(book);
+                      setShowModal(true);
+                    }}
                     className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Edit
@@ -87,6 +106,13 @@ function Admin() {
           </tbody>
         </table>
       </div>
+
+      <BookModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={saveBookHandler}
+        book={selectedBook}
+      />
     </div>
   );
 }

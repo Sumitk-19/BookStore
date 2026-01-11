@@ -56,9 +56,22 @@ exports.getBookById = asyncHandler(async (req, res) => {
 // @route   POST /api/books
 // @access  Admin
 exports.createBook = asyncHandler(async (req, res) => {
-  const book = await Book.create(req.body);
+  const { title, author, price, category, stock } = req.body;
+
+  const image = req.file ? `/uploads/${req.file.filename}` : "";
+
+  const book = await Book.create({
+    title,
+    author,
+    price,
+    category,
+    stock,
+    image,   // 👈 here
+  });
+
   res.status(201).json(book);
 });
+
 
 // @desc    Update book
 // @route   PUT /api/books/:id
@@ -71,11 +84,20 @@ exports.updateBook = asyncHandler(async (req, res) => {
     throw new Error("Book not found");
   }
 
-  Object.assign(book, req.body);
-  const updatedBook = await book.save();
+  book.title = req.body.title || book.title;
+  book.author = req.body.author || book.author;
+  book.price = req.body.price || book.price;
+  book.category = req.body.category || book.category;
+  book.stock = req.body.stock || book.stock;
 
+  if (req.file) {
+    book.image = `/uploads/${req.file.filename}`;   // 👈 here
+  }
+
+  const updatedBook = await book.save();
   res.json(updatedBook);
 });
+
 
 // @desc    Delete book
 // @route   DELETE /api/books/:id

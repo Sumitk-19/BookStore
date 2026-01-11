@@ -47,42 +47,48 @@ function Home() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-orange-50 to-white rounded-2xl mb-12">
+        <div className="px-6 py-16 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-700">
+              Discover Books That Shape Your Future
+            </span>
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+            Explore curated collections across Technology, Fiction, and Self-Help.
+            Find your next great read in seconds.
+          </p>
 
-      {/* Header
-      <h1 className="text-3xl font-bold mb-1">BookNest</h1>
-      <p className="text-gray-600 mb-6">Browse our collection</p> */}
+          <form
+            onSubmit={submitHandler}
+            className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-3 flex flex-col md:flex-row gap-3"
+          >
+            <input
+              type="text"
+              placeholder="Search by title or author…"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="flex-1 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-orange-400 outline-none"
+            />
 
-      {/* Search & Filter */}
-      <form
-        onSubmit={submitHandler}
-        className="bg-white shadow rounded-lg p-4 flex flex-col md:flex-row gap-3 mb-6"
-      >
-        <input
-          type="text"
-          placeholder="Search by title or author"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          className="flex-1 border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
-        />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="px-4 py-3 rounded-xl border focus:ring-2 focus:ring-orange-400 outline-none"
+            >
+              <option value="">All Categories</option>
+              <option value="Self Help">Self Help</option>
+              <option value="Fiction">Fiction</option>
+              <option value="Technology">Technology</option>
+            </select>
 
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
-        >
-          <option value="">All Categories</option>
-          <option value="Self Help">Self Help</option>
-          <option value="Fiction">Fiction</option>
-          <option value="Technology">Technology</option>
-        </select>
-
-        <button
-          type="submit"
-          className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 transition"
-        >
-          Search
-        </button>
-      </form>
+            <button className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition">
+              Search
+            </button>
+          </form>
+        </div>
+      </div>
 
       {/* Loading / Error */}
       {loading && <p className="text-center">Loading books...</p>}
@@ -93,20 +99,36 @@ function Home() {
         {books.map((book) => (
           <div
             key={book._id}
-            className="bg-white rounded-xl shadow p-4 hover:shadow-lg transition flex flex-col"
+            className="group bg-white rounded-xl p-4 shadow-md 
+                       hover:shadow-2xl hover:-translate-y-2
+                       transition-all duration-300 border border-transparent 
+                       hover:border-orange-200"
           >
-            <div className="flex-1">
-              <h3 className="text-lg font-bold">{book.title}</h3>
-              <p className="text-sm text-gray-600">{book.author}</p>
-              <p className="text-green-600 font-semibold mt-1">₹{book.price}</p>
-              <span className="inline-block text-xs bg-gray-100 px-2 py-1 rounded mt-1">
-                {book.category}
-              </span>
-            </div>
+
+            <img
+              src={book.image}
+              alt={book.title}
+              className="w-full h-48 object-contain mb-3 transition-transform duration-300 group-hover:scale-105"
+            />
+
+
+            <h3 className="text-lg font-bold group-hover:text-orange-500 transition">
+              {book.title}
+            </h3>
+
+            <p className="text-sm text-gray-600">{book.author}</p>
+
+            <p className="text-green-600 font-semibold mt-1">₹{book.price}</p>
+
+            <span className="inline-block mt-1 text-xs bg-gray-100 px-2 py-1 rounded">
+              {book.category}
+            </span>
 
             <button
               onClick={() => addToCart(book)}
-              className="mt-4 bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
+              className="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg 
+                         font-semibold hover:bg-orange-600
+                         transition transform group-hover:scale-105"
             >
               Add to Cart
             </button>
@@ -115,12 +137,12 @@ function Home() {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-8 gap-2">
+      <div className="flex justify-center mt-10 gap-2">
         {[...Array(pages).keys()].map((x) => (
           <button
             key={x + 1}
             onClick={() => fetchBooks(x + 1)}
-            className={`px-3 py-1 rounded border ${
+            className={`px-3 py-1 rounded-lg border ${
               x + 1 === page
                 ? "bg-orange-500 text-white"
                 : "bg-white hover:bg-gray-100"
