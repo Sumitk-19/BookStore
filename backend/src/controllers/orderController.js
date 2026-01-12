@@ -11,7 +11,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
-    throw new Error("No order items provided");
+    throw new Error(JSON.stringify(req.body));
+
   }
 
   // 1️⃣ Validate stock
