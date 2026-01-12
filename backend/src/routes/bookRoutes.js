@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const { protect, admin } = require("../middleware/authMiddleware");
 const {
   getAllBooks,
@@ -10,11 +9,11 @@ const {
   deleteBook,
 } = require("../controllers/bookController");
 
-// Public routes
+// Public
 router.get("/", getAllBooks);
 router.get("/:id", getBookById);
 
-// Admin routes
+// Admin
 router.post("/", protect, admin, createBook);
 router.put("/:id", protect, admin, updateBook);
 router.delete("/:id", protect, admin, deleteBook);

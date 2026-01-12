@@ -53,11 +53,22 @@ function BookModal({ show, onClose, onSave, book }) {
             <option>Technology</option>
           </select>
 
-          <input type="file" accept="image/*" onChange={handleImage} />
+          <input
+                type="text"
+                name="image"
+                placeholder="Paste Image URL"
+                value={form.image}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+           />
 
-          {form.image && (
-            <img src={form.image} alt="Preview" className="h-40 mx-auto rounded shadow" />
-          )}
+              {form.image && (
+              <img
+                  src={form.image}
+                  alt="Preview"
+                  className="h-40 mt-2 object-contain rounded shadow"
+              />
+         )}
 
           <button className="w-full bg-orange-500 text-white py-2 rounded">
             {book ? "Update Book" : "Add Book"}

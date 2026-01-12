@@ -19,18 +19,45 @@ function Admin() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this book?")) return;
-    await api.delete(`/books/${id}`);
+
+    const token = localStorage.getItem("token");
+
+    await api.delete(`/books/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     fetchBooks();
   };
 
   const saveBookHandler = async (formData) => {
-    if (selectedBook) {
-      await api.put(`/books/${selectedBook._id}`, formData);
-    } else {
-      await api.post("/books", formData);
+    try {
+      const token = localStorage.getItem("token");
+
+      if (selectedBook) {
+        // Edit
+        await api.put(`/books/${selectedBook._id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        // Add
+        await api.post("/books", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
+      setShowModal(false);
+      setSelectedBook(null);
+      fetchBooks();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save book");
     }
-    setShowModal(false);
-    fetchBooks();
   };
 
   return (
@@ -76,7 +103,7 @@ function Admin() {
                   <img
                     src={book.image}
                     alt={book.title}
-                    className="h-12 w-10 object-cover rounded shadow"
+                    className="h-14 w-10 object-cover rounded shadow"
                   />
                 </td>
                 <td className="p-3 font-medium">{book.title}</td>
@@ -109,7 +136,10 @@ function Admin() {
 
       <BookModal
         show={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedBook(null);
+        }}
         onSave={saveBookHandler}
         book={selectedBook}
       />
