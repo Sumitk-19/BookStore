@@ -47,6 +47,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
   });
 
   // 4️⃣ Send confirmation email 📧
+  // 4️⃣ Send confirmation email 📧 (non-blocking)
+try {
   await sendEmail(
     req.user.email,
     "Your BookNest Order is Confirmed",
@@ -59,6 +61,10 @@ exports.createOrder = asyncHandler(async (req, res) => {
       <p>Thank you for shopping with <b>BookNest</b>.</p>
     `
   );
+} catch (err) {
+  console.log("Email failed:", err.message);
+}
+
 
   res.status(201).json(order);
 });
