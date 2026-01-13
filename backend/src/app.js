@@ -9,14 +9,20 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
-app.use(cors({
-  origin: "https://book-store-six-ruby.vercel.app/",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://book-store-six-ruby.vercel.app"
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-app.options("*", cors());
+
+// app.options("*", cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
