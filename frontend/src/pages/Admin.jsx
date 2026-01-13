@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import BookModal from "../components/BookModal";
+import PageWrapper from "../components/PageWrapper";
 
 function Admin() {
   const [books, setBooks] = useState([]);
@@ -23,9 +24,7 @@ function Admin() {
     const token = localStorage.getItem("token");
 
     await api.delete(`/books/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     fetchBooks();
@@ -36,18 +35,12 @@ function Admin() {
       const token = localStorage.getItem("token");
 
       if (selectedBook) {
-        // Edit
         await api.put(`/books/${selectedBook._id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        // Add
         await api.post("/books", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
       }
 
@@ -61,31 +54,33 @@ function Admin() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <Link
-        to="/admin/orders"
-        className="inline-block mb-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
-      >
-        Manage All Orders
-      </Link>
+    <PageWrapper>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <div className="flex gap-3">
+          <Link
+            to="/admin/orders"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          >
+            Manage Orders
+          </Link>
 
-        <button
-          onClick={() => {
-            setSelectedBook(null);
-            setShowModal(true);
-          }}
-          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
-        >
-          + Add New Book
-        </button>
+          <button
+            onClick={() => {
+              setSelectedBook(null);
+              setShowModal(true);
+            }}
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+          >
+            + Add New Book
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
+      <div className="backdrop-blur-xl bg-white/70 rounded-xl shadow-lg overflow-x-auto border border-white/40">
         <table className="w-full text-sm text-left">
-          <thead className="bg-gray-100">
+          <thead className="bg-white/60 backdrop-blur">
             <tr>
               <th className="p-3">Image</th>
               <th className="p-3">Title</th>
@@ -98,7 +93,10 @@ function Admin() {
           </thead>
           <tbody>
             {books.map((book) => (
-              <tr key={book._id} className="border-t">
+              <tr
+                key={book._id}
+                className="border-t hover:bg-orange-50/40 transition"
+              >
                 <td className="p-3">
                   <img
                     src={book.image}
@@ -143,7 +141,7 @@ function Admin() {
         onSave={saveBookHandler}
         book={selectedBook}
       />
-    </div>
+    </PageWrapper>
   );
 }
 

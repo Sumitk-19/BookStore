@@ -3,6 +3,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+import PageWrapper from "../components/PageWrapper";
 
 function Checkout() {
   const { cartItems, clearCart } = useCart();
@@ -55,7 +56,6 @@ function Checkout() {
 
       clearCart();
 
-      // Small delay to avoid PrivateRoute race condition
       setTimeout(() => {
         navigate(`/order-success/${data._id}`, { replace: true });
       }, 100);
@@ -66,45 +66,49 @@ function Checkout() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <PageWrapper>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      {/* Address Form */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Delivery Details</h2>
-        <div className="space-y-3">
-          <input className="input" name="name" placeholder="Full Name" onChange={handleChange} />
-          <input className="input" name="phone" placeholder="Mobile Number" onChange={handleChange} />
-          <textarea className="input" name="address" placeholder="Full Address" onChange={handleChange} />
-          <input className="input" name="city" placeholder="City" onChange={handleChange} />
-          <input className="input" name="state" placeholder="State" onChange={handleChange} />
-          <input className="input" name="pincode" placeholder="Pincode" onChange={handleChange} />
-        </div>
-      </div>
+        {/* Address Form */}
+        <div className="backdrop-blur-xl bg-white/70 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">Delivery Details</h2>
 
-      {/* Order Summary */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-
-        {cartItems.map((item) => (
-          <div key={item._id} className="flex justify-between border-b py-2 text-sm">
-            <span>{item.title} × {item.quantity}</span>
-            <span>₹{item.price * item.quantity}</span>
+          <div className="space-y-3">
+            <input className="input" name="name" placeholder="Full Name" onChange={handleChange} />
+            <input className="input" name="phone" placeholder="Mobile Number" onChange={handleChange} />
+            <textarea className="input" name="address" placeholder="Full Address" onChange={handleChange} />
+            <input className="input" name="city" placeholder="City" onChange={handleChange} />
+            <input className="input" name="state" placeholder="State" onChange={handleChange} />
+            <input className="input" name="pincode" placeholder="Pincode" onChange={handleChange} />
           </div>
-        ))}
-
-        <div className="flex justify-between font-bold text-lg mt-4">
-          <span>Total</span>
-          <span>₹{total}</span>
         </div>
 
-        <button
-          onClick={placeOrderHandler}
-          className="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg text-lg hover:bg-orange-600 transition"
-        >
-          Place Order
-        </button>
+        {/* Order Summary */}
+        <div className="backdrop-blur-xl bg-white/70 p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+
+          {cartItems.map((item) => (
+            <div key={item._id} className="flex justify-between border-b py-2 text-sm">
+              <span>{item.title} × {item.quantity}</span>
+              <span>₹{item.price * item.quantity}</span>
+            </div>
+          ))}
+
+          <div className="flex justify-between font-bold text-lg mt-4">
+            <span>Total</span>
+            <span className="text-green-600">₹{total}</span>
+          </div>
+
+          <button
+            onClick={placeOrderHandler}
+            className="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg text-lg hover:bg-orange-600 transition"
+          >
+            Place Order
+          </button>
+        </div>
+
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

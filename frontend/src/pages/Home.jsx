@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import PageWrapper from "../components/PageWrapper";
 
 function Home() {
   const [books, setBooks] = useState([]);
@@ -59,23 +60,22 @@ function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
-
+    <PageWrapper>
       {/* Hero */}
-      <div className="bg-gradient-to-b from-orange-50 to-white rounded-2xl mb-12">
+      <div className="bg-gradient-to-b from-orange-100/60 to-white/40 backdrop-blur-xl rounded-3xl mb-12 shadow-lg">
         <div className="px-6 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-700">
               Discover Books That Shape Your Future
             </span>
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-gray-700 max-w-2xl mx-auto mb-8">
             Explore curated collections across Technology, Fiction, and Self-Help.
           </p>
 
           <form
             onSubmit={submitHandler}
-            className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-3 flex flex-col md:flex-row gap-3"
+            className="max-w-3xl mx-auto bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col md:flex-row gap-3"
           >
             <input
               type="text"
@@ -111,7 +111,7 @@ function Home() {
         {books.map((book) => (
           <div
             key={book._id}
-            className="group bg-white rounded-xl p-4 shadow-md 
+            className="group backdrop-blur-xl bg-white/70 rounded-xl p-4 shadow-lg 
                        hover:shadow-2xl hover:-translate-y-2
                        transition-all duration-300 border border-transparent 
                        hover:border-orange-200"
@@ -152,17 +152,17 @@ function Home() {
           <button
             key={x + 1}
             onClick={() => fetchBooks(x + 1)}
-            className={`px-3 py-1 rounded-lg border ${
+            className={`px-3 py-1 rounded-lg border backdrop-blur-md ${
               x + 1 === page
                 ? "bg-orange-500 text-white"
-                : "bg-white hover:bg-gray-100"
+                : "bg-white/70 hover:bg-gray-100"
             }`}
           >
             {x + 1}
           </button>
         ))}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

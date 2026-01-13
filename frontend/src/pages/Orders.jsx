@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
+import PageWrapper from "../components/PageWrapper";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
@@ -14,8 +15,8 @@ function Orders() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 py-10">
-      <div className="max-w-6xl mx-auto px-6">
+    <PageWrapper>
+      <div className="max-w-6xl mx-auto px-6 py-10">
         <h1 className="text-4xl font-bold mb-8 text-gray-800">My Orders</h1>
 
         {orders.length === 0 && (
@@ -40,7 +41,7 @@ function Orders() {
               </div>
 
               <span
-                className={`px-3 py-1 text-xs rounded-full font-semibold animate-pulse ${
+                className={`px-3 py-1 text-xs rounded-full font-semibold ${
                   order.status === "Delivered"
                     ? "bg-green-100 text-green-700"
                     : order.status === "Shipped"
@@ -52,18 +53,11 @@ function Orders() {
               </span>
             </div>
 
-            {/* Meta Info */}
+            {/* Meta */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-              <p>
-                <strong>Total:</strong> ₹{order.totalAmount}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Items:</strong> {order.orderItems.length}
-              </p>
+              <p><strong>Total:</strong> ₹{order.totalAmount}</p>
+              <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+              <p><strong>Items:</strong> {order.orderItems.length}</p>
             </div>
 
             {/* Items */}
@@ -71,16 +65,9 @@ function Orders() {
               <p className="font-semibold mb-2 text-gray-700">Items</p>
               <ul className="space-y-1 text-sm">
                 {order.orderItems.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="flex justify-between text-gray-700"
-                  >
-                    <span>
-                      {item.title} × {item.quantity}
-                    </span>
-                    <span>
-                      ₹{Number(item.price || 0) * Number(item.quantity || 0)}
-                    </span>
+                  <li key={idx} className="flex justify-between text-gray-700">
+                    <span>{item.title} × {item.quantity}</span>
+                    <span>₹{item.price * item.quantity}</span>
                   </li>
                 ))}
               </ul>
@@ -88,7 +75,7 @@ function Orders() {
           </div>
         ))}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

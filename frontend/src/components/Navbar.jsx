@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { FaShoppingCart, FaRegUser } from "react-icons/fa";
 
 function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -21,7 +21,7 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
 
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-orange-500">
+        <Link to="/" className="text-3xl font-bold text-orange-500">
           BookNest
         </Link>
 
@@ -58,7 +58,7 @@ function Navbar() {
 
               {/* User Name + Logout */}
               <div className="flex items-center gap-2">
-                <FaUserCircle className="text-xl text-gray-600" />
+                <FaRegUser className="text-xl text-gray-600" />
                 <span className="font-medium">{user?.name}</span>
 
                 <button
