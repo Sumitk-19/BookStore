@@ -42,6 +42,8 @@ function Checkout() {
     const orderPayload = {
       orderItems: cartItems.map((item) => ({
         book: item._id,
+        title: item.title,
+        price: item.price,
         quantity: item.quantity,
       })),
       totalAmount: total,

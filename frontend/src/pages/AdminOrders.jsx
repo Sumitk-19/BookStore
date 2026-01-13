@@ -156,15 +156,14 @@ function AdminOrders() {
       {/* Items */}
       <div className="space-y-2 text-sm mb-4">
         {selectedOrder.orderItems.map((item, i) => (
-          <div key={i} className="flex justify-between border-b pb-1">
-            <span>
-              {item.title} × {item.quantity}
-            </span>
-            <span className="font-medium">
+         <div key={i} className="flex justify-between border-b pb-1">
+          <span>{item.title} × {item.quantity}</span>
+          <span className="font-medium">
               ₹{item.price * item.quantity}
-            </span>
-          </div>
-        ))}
+          </span>
+         </div>
+    ))}
+
       </div>
 
       {/* Total */}

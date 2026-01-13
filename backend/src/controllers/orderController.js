@@ -14,7 +14,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new Error("No order items provided");
   }
 
-  // Validate stock
+  // 1. Validate stock
   for (const item of orderItems) {
     const book = await Book.findById(item.book);
 
@@ -31,22 +31,29 @@ exports.createOrder = asyncHandler(async (req, res) => {
     }
   }
 
-  // Deduct stock
+  // 2. Deduct stock
   for (const item of orderItems) {
     const book = await Book.findById(item.book);
     book.stock -= item.quantity;
     await book.save();
   }
 
-  // Create order
+  // 3. Store snapshot (title & price) in order
+  const formattedItems = orderItems.map((item) => ({
+    book: item.book,
+    title: item.title,
+    price: item.price,
+    quantity: item.quantity,
+  }));
+
   const order = await Order.create({
     user: req.user._id,
-    orderItems,
+    orderItems: formattedItems,
     totalAmount,
     shippingAddress,
   });
 
-  // Send email safely (won't break order flow if email fails)
+  // 4. Send email (non-blocking)
   try {
     await sendEmail(
       req.user.email,

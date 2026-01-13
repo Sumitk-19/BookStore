@@ -13,8 +13,8 @@ function Admin() {
   }, []);
 
   const fetchBooks = async () => {
-    const { data } = await api.get("/books");
-    setBooks(data.books || data);
+    const { data } = await api.get("/books?limit=1000");
+    setBooks(data.books);
   };
 
   const handleDelete = async (id) => {
