@@ -8,11 +8,11 @@ const {
   updateOrderStatus,
 } = require("../controllers/orderController");
 
-// User
+// User routes
 router.post("/", protect, createOrder);
 router.get("/my-orders", protect, getMyOrders);
 
-// Admin
+// Admin routes
 router.get("/", protect, admin, getAllOrders);
 router.put("/:id", protect, admin, updateOrderStatus);
 

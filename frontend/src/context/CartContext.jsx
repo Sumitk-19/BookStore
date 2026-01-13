@@ -1,26 +1,27 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
 
-  // Load cart from localStorage
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) setCartItems(JSON.parse(storedCart));
-  }, []);
+  // Load cart from localStorage (prevents reset on refresh / route change)
+  const [cartItems, setCartItems] = useState(() => {
+    const storedCart = localStorage.getItem("cartItems");
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
 
-  // Save cart to localStorage
+  // Persist cart to localStorage
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Add item to cart
   const addToCart = (book) => {
     const existing = cartItems.find((item) => item._id === book._id);
 
     if (existing) {
+      if (existing.quantity >= book.stock) return;
+
       setCartItems(
         cartItems.map((item) =>
           item._id === book._id
@@ -33,42 +34,44 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Increase quantity with stock validation
   const increaseQty = (id) => {
-  setCartItems((prevItems) =>
-    prevItems.map((item) => {
-      if (item._id === id) {
-        if (item.quantity >= item.stock) {
-          return item; // Do not increase beyond stock
+    setCartItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item._id === id) {
+          if (item.quantity >= item.stock) return item;
+          return { ...item, quantity: item.quantity + 1 };
         }
-        return { ...item, quantity: item.quantity + 1 };
-      }
-      return item;
-    })
-  );
-};
+        return item;
+      })
+    );
+  };
 
+  // Decrease quantity (remove if zero)
+  const decreaseQty = (id) => {
+    setCartItems((prevItems) =>
+      prevItems
+        .map((item) =>
+          item._id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
 
-const decreaseQty = (id) => {
-  setCartItems(
-    cartItems
-      .map((item) =>
-        item._id === id
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-      .filter((item) => item.quantity > 0)
-  );
-};
-
-
+  // Remove single item
   const removeFromCart = (id) => {
     setCartItems(cartItems.filter((item) => item._id !== id));
   };
 
+  // Clear entire cart (used after order / logout)
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem("cartItems");
   };
 
+  // Calculate total
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -76,7 +79,15 @@ const decreaseQty = (id) => {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty,clearCart, totalAmount }}
+      value={{
+        cartItems,
+        addToCart,
+        increaseQty,
+        decreaseQty,
+        removeFromCart,
+        clearCart,
+        totalAmount,
+      }}
     >
       {children}
     </CartContext.Provider>

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [books, setBooks] = useState([]);
@@ -10,7 +12,10 @@ function Home() {
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const fetchBooks = async (pageNumber = 1) => {
     try {
@@ -45,9 +50,18 @@ function Home() {
     fetchBooks(1);
   };
 
+  const handleAddToCart = (book) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    addToCart(book);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
-      {/* Hero Section */}
+
+      {/* Hero */}
       <div className="bg-gradient-to-b from-orange-50 to-white rounded-2xl mb-12">
         <div className="px-6 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
@@ -57,7 +71,6 @@ function Home() {
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8">
             Explore curated collections across Technology, Fiction, and Self-Help.
-            Find your next great read in seconds.
           </p>
 
           <form
@@ -90,11 +103,10 @@ function Home() {
         </div>
       </div>
 
-      {/* Loading / Error */}
       {loading && <p className="text-center">Loading books...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {/* Books Grid */}
+      {/* Books */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {books.map((book) => (
           <div
@@ -104,13 +116,11 @@ function Home() {
                        transition-all duration-300 border border-transparent 
                        hover:border-orange-200"
           >
-
             <img
               src={book.image}
               alt={book.title}
               className="w-full h-48 object-contain mb-3 transition-transform duration-300 group-hover:scale-105"
             />
-
 
             <h3 className="text-lg font-bold group-hover:text-orange-500 transition">
               {book.title}
@@ -125,7 +135,7 @@ function Home() {
             </span>
 
             <button
-              onClick={() => addToCart(book)}
+              onClick={() => handleAddToCart(book)}
               className="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg 
                          font-semibold hover:bg-orange-600
                          transition transform group-hover:scale-105"

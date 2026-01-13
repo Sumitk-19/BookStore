@@ -1,9 +1,9 @@
 const Order = require("../models/Order");
 const Book = require("../models/Book");
 const asyncHandler = require("../middleware/asyncHandler");
-const sendEmail = require("../utils/sendEmail"); // 👈 use require, not import
+const sendEmail = require("../utils/sendEmail");
 
-// @desc    Create order + deduct stock + send email
+// @desc    Create order
 // @route   POST /api/orders
 // @access  User
 exports.createOrder = asyncHandler(async (req, res) => {
@@ -11,11 +11,10 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
-    throw new Error(JSON.stringify(req.body));
-
+    throw new Error("No order items provided");
   }
 
-  // 1️⃣ Validate stock
+  // Validate stock
   for (const item of orderItems) {
     const book = await Book.findById(item.book);
 
@@ -32,14 +31,14 @@ exports.createOrder = asyncHandler(async (req, res) => {
     }
   }
 
-  // 2️⃣ Deduct stock
+  // Deduct stock
   for (const item of orderItems) {
     const book = await Book.findById(item.book);
     book.stock -= item.quantity;
     await book.save();
   }
 
-  // 3️⃣ Create order
+  // Create order
   const order = await Order.create({
     user: req.user._id,
     orderItems,
@@ -47,22 +46,23 @@ exports.createOrder = asyncHandler(async (req, res) => {
     shippingAddress,
   });
 
-  // 4️⃣ Send confirmation email 📧
-  // 4️⃣ Send confirmation email 📧 (non-blocking)
-sendEmail(
-  req.user.email,
-  "Your BookNest Order is Confirmed",
-  `
-    <h2>Order Confirmed 🎉</h2>
-    <p>Order ID: ${order._id}</p>
-    <p>Total Amount: ₹${order.totalAmount}</p>
-    <p>We will notify you when your books are shipped.</p>
-    <br/>
-    <p>Thank you for shopping with <b>BookNest</b>.</p>
-  `
-).catch(err => console.log("Email failed:", err.message));
-
-
+  // Send email safely (won't break order flow if email fails)
+  try {
+    await sendEmail(
+      req.user.email,
+      "Your BookNest Order is Confirmed",
+      `
+        <h2>Order Confirmed 🎉</h2>
+        <p>Order ID: ${order._id}</p>
+        <p>Total Amount: ₹${order.totalAmount}</p>
+        <p>We will notify you when your books are shipped.</p>
+        <br/>
+        <p>Thank you for shopping with <b>BookNest</b>.</p>
+      `
+    );
+  } catch (err) {
+    console.log("Email failed:", err.message);
+  }
 
   res.status(201).json(order);
 });

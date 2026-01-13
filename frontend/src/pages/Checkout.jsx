@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
 function Checkout() {
   const { cartItems, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
@@ -16,6 +18,12 @@ function Checkout() {
     pincode: "",
   });
 
+  // Guard routes
+  useEffect(() => {
+    if (!isAuthenticated) navigate("/login", { replace: true });
+    if (cartItems.length === 0) navigate("/cart", { replace: true });
+  }, [isAuthenticated, cartItems, navigate]);
+
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -26,50 +34,41 @@ function Checkout() {
   };
 
   const placeOrderHandler = async () => {
-    if (
-      !address.name ||
-      !address.phone ||
-      !address.address ||
-      !address.city ||
-      !address.state ||
-      !address.pincode
-    ) {
+    if (Object.values(address).some((v) => v.trim() === "")) {
       alert("Please fill all delivery details");
       return;
     }
 
+    const orderPayload = {
+      orderItems: cartItems.map((item) => ({
+        book: item._id,
+        quantity: item.quantity,
+      })),
+      totalAmount: total,
+      shippingAddress: address,
+    };
+
     try {
-      const orderPayload = {
-        orderItems: cartItems.map((item) => ({
-          book: item._id,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-        totalAmount: total,
-        shippingAddress: address,
-      };
-
-      const token = localStorage.getItem("token");
-
-      const { data } = await api.post("/orders", orderPayload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.post("/orders", orderPayload);
 
       clearCart();
-      navigate(`/order-success/${data._id}`);
+
+      // Small delay to avoid PrivateRoute race condition
+      setTimeout(() => {
+        navigate(`/order-success/${data._id}`, { replace: true });
+      }, 100);
     } catch (error) {
-      alert("Order failed. Try again.");
+      console.error("Order error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Order failed. Please try again.");
     }
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-      
+
       {/* Address Form */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Delivery Details</h2>
-
         <div className="space-y-3">
           <input className="input" name="name" placeholder="Full Name" onChange={handleChange} />
           <input className="input" name="phone" placeholder="Mobile Number" onChange={handleChange} />
@@ -98,7 +97,7 @@ function Checkout() {
 
         <button
           onClick={placeOrderHandler}
-          className="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg text-lg hover:bg-orange-600"
+          className="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg text-lg hover:bg-orange-600 transition"
         >
           Place Order
         </button>
