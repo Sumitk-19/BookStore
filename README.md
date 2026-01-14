@@ -79,13 +79,39 @@ BookStore/
 └── README.md
 ---
 
-## 📧 Email System
 
-Integrated with **Resend API** for transactional emails.  
-Currently running in development mode (Gmail testing).  
-Production-ready with domain verification support.
+## 🚧 Missing & Upcoming Features (Planned Enhancements)
+
+BookNest is an evolving project. The following features are planned for future releases:
+
+### 🔜 Payment Integration
+- Razorpay / Stripe payment gateway
+- Secure online transactions
+- Invoice generation after payment
+
+### 📧 Production Email System
+- Currently, order confirmation emails work in development.
+- In production, emails may not reach all users due to domain verification limits.
+- A verified custom domain with Resend will be added to enable 100% reliable delivery.
+
+### 📦 Order Enhancements
+- Order cancellation & refund flow
+- Invoice PDF download
+- Delivery tracking system
+
+### 🎯 Performance & UX
+- Image optimization & lazy loading
+- Skeleton loaders
+- Wishlist feature
+- Book reviews & ratings
+
+### 📱 Mobile App (Future Scope)
+- React Native mobile version of BookNest
+
+This project is actively evolving and will continue to receive feature upgrades and performance improvements.
 
 ---
+
 
 ## 🧑‍💻 Author
 
