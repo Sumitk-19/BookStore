@@ -71,14 +71,14 @@ Backend API: https://bookstore-n3lv.onrender.com
 - Secure API with CORS configuration
 
 ---
-
+```
 ## 📦 Project Structure
 BookStore/
 ├── frontend/ (React + Tailwind)
 ├── backend/ (Node + Express + MongoDB)
 └── README.md
 ---
-
+```
 
 ## 🚧 Missing & Upcoming Features (Planned Enhancements)
 
