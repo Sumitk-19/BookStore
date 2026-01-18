@@ -19,7 +19,7 @@ Backend API: https://bookstore-n3lv.onrender.com
 ---
 
 ## 🛠 Tech Stack
-
+---
 ### Frontend
 - React.js (Vite)
 - Tailwind CSS
